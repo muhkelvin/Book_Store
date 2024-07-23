@@ -11,21 +11,23 @@ class AdminDashboardController extends Controller
     public function index()
     {
         // Ambil semua pengguna dan transaksi mereka
-        $users = User::with('paymentStatuses')->get();
+        $users = User::with('paymentStatuses.product')->get();
 
         return view('admin.dashboard', compact('users'));
     }
 
     public function updatePaymentStatus(Request $request)
     {
-        $paymentStatus = PaymentStatus::findOrFail($request->payment_status_id);
-        $paymentStatus->status = $request->status === 'true';
-        $paymentStatus->save();
+        $user = User::findOrFail($request->user_id);
+        $status = $request->status === 'true';
 
-        $user = $paymentStatus->user;
-        $user->is_admin = $paymentStatus->status; // Set user as admin if payment status is true
-        $user->save();
+        // Update status pembayaran semua produk yang dibeli pengguna
+        foreach ($user->paymentStatuses as $paymentStatus) {
+            $paymentStatus->status = $status;
+            $paymentStatus->save();
+        }
 
-        return redirect()->back()->with('success', 'Payment status updated successfully.');
+        return redirect()->back()->with('success', 'All payment statuses updated successfully.');
     }
 }
+

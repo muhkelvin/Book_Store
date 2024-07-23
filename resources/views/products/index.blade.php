@@ -13,7 +13,6 @@
                             @csrf
                             <input type="hidden" name="product_id" value="{{ $product->id }}">
                             <button type="submit" class="w-full bg-blue-500 text-black py-2 rounded">Add to Cart</button>
-
                         </form>
                     </div>
                 </div>
